@@ -158,7 +158,7 @@ function ls(k,v){try{if(v===undefined){return JSON.parse(localStorage.getItem(k)
 function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
 function fmt(d){try{return new Date(d+"T12:00:00").toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"})}catch(e){return d}}
 function all(){return SEED.slice().sort(function(a,b){return a.date<b.date?1:-1})}
-function card(e){return '<article class="dlg"><div class="av" aria-hidden="true"></div><div class="msg"><span class="tag2">'+fmt(e.date)+'</span><h3>'+esc(e.title)+'</h3>'+(e.img?'<img class="pic" alt="Foto de la entrada" src="'+e.img+'">':'')+'<p>'+esc(e.text).replace(/\n/g,"<br>")+'</p></div></article>'}
+function card(e){return '<article class="dlg"><div class="av" aria-hidden="true"></div><div class="msg"><span class="tag2">'+fmt(e.date)+'</span><h3>'+esc(e.title)+'</h3>'+(e.img?'<img class="pic" alt="Foto de la entrada" src="'+e.img+'">':'')+'<p>'+esc(e.text).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>")+'</p></div></article>'}
 function render(){var a=all();document.getElementById("latest").innerHTML=card(a[0]);document.getElementById("entries").innerHTML=a.map(card).join("")}
 function show(){var h=(location.hash||"#inicio").slice(1);if(!document.getElementById(h))h="inicio";
  document.querySelectorAll("section").forEach(function(s){s.classList.toggle("on",s.id===h)});
