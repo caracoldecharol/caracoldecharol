@@ -168,7 +168,18 @@ function poll(){var v=ls("cc_poll")||[0,0,0,0],voted=ls("cc_voted"),tot=v.reduce
   b.onclick=function(){if(ls("cc_voted")!==null)return;v[i]++;ls("cc_poll",v);ls("cc_voted",i);poll()};box.appendChild(b)});
  document.getElementById("total").textContent=voted!==null?"Gracias por votar. Votos en este navegador: "+tot:"Pulsa una opción para votar y ver los resultados."}
 document.getElementById("theme").onclick=function(){var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":!matchMedia("(prefers-color-scheme: light)").matches;r.dataset.theme=dark?"light":"dark"};
-render();poll();show();
+var GALERIA=[
+ {src:"imagenes/captura1.png",txt:"Primera prueba de movimiento"},
+ {src:"imagenes/captura2.png",txt:"Boceto del escenario"}
+];
+function galeria(){
+  var g=document.getElementById("gallery"),lb=document.getElementById("lb");
+  g.innerHTML=GALERIA.map(function(f,i){return '<figure class="shot" data-i="'+i+'"><img src="'+f.src+'" alt="'+esc(f.txt)+'" loading="lazy"><figcaption>'+esc(f.txt)+'</figcaption></figure>'}).join("");
+  g.querySelectorAll(".shot").forEach(function(s){s.onclick=function(){var f=GALERIA[s.dataset.i];lb.querySelector("img").src=f.src;lb.querySelector("p").textContent=f.txt;lb.classList.add("on")}});
+  lb.onclick=function(){lb.classList.remove("on")};
+}
+  
+render();poll();show();galeria();
 </script>
 </body>
 </html>
