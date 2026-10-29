@@ -124,6 +124,24 @@ details.more .gal3{margin-top:22px}
 .bk-nav button:disabled{opacity:.35;cursor:default}
 @media (max-width:600px){.sinopsis.ph{grid-template-columns:1fr;justify-items:center;text-align:center}.sprite-big{width:150px}.gal3{gap:10px}.shot figcaption{font-size:16px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.snail{left:20px}}
+/* ===== CARRERA DE CARACOLES (pestaña Enlaces) ===== */
+.race{margin-top:34px}
+.race h3{color:var(--shell)}
+.race .btn{margin-top:6px}
+.lane{margin:0 0 10px}
+.lane-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:21px;margin:0 14px 2px 0}
+.lane-top b{font-family:'Press Start 2P',monospace;font-weight:400;font-size:10px;padding:6px 8px;border:3px solid var(--line);background:var(--panel);color:var(--ink)}
+.lane .rk{display:inline-block;min-width:34px;text-align:center;font-family:'Press Start 2P',monospace;font-size:9px;padding:4px 5px;margin-left:6px;background:var(--shell);color:#222034;border:3px solid var(--line);visibility:hidden}
+.lane .rk.on{visibility:visible}
+.rail{position:relative;height:58px;margin:0 14px 0 68px;border-bottom:3px solid var(--muted);border-right:2px solid rgba(128,128,128,.35);background:linear-gradient(90deg,rgba(128,128,128,.35) 2px,transparent 2px) 0 0/25% 100%}
+.rail .bar{position:absolute;left:0;bottom:0;height:10px;width:0}
+.rsnail{position:absolute;bottom:6px;left:0;width:64px;height:48px;transform:translateX(-100%)}
+.rsnail svg{display:block;width:100%;height:100%;shape-rendering:crispEdges}
+.rsnail.go svg{animation:bob .8s steps(2) infinite}
+.axis{position:relative;height:26px;margin:4px 14px 0 68px;font-size:18px;color:var(--muted)}
+.axis span{position:absolute;top:0;transform:translateX(-50%)}
+#racemsg{margin:8px 0 10px;min-height:1.4em}
+@media (max-width:520px){.rail,.axis{margin-left:60px}.rsnail{width:56px;height:42px}}
 </style>
 </head>
 <body>
@@ -180,6 +198,14 @@ details.more .gal3{margin-top:22px}
     <!-- <a class="btn" href="https://itch.io/" target="_blank" rel="noopener">itch.io</a> -->
   </div>
   <p class="hint">Sígueme en mis redes para estar al tanto del proceso :)</p>
+
+  <div class="card race" aria-live="polite">
+    <h3>Carrera de caracoles</h3>
+    <p class="hint">Cuantos más seguidores, más lejos llega cada caracol.</p>
+    <div id="lanes"></div>
+    <p id="racemsg"></p>
+    <button class="btn" id="again" type="button">Repetir carrera</button>
+  </div>
 </section>
 
 <footer>
@@ -229,6 +255,12 @@ Separa los párrafos con una línea en blanco y el libro los reparte solo en pá
 ];
 // Encuesta: foto opcional general y, si quieres, una foto por opción (img:"imagenes/x.png").
 var ENCUESTA={pregunta:"¿Mola el diario?",foto:"",opciones:[{t:"Infalible e indubitablemente sí",img:""},{t:"Súper sí Caracol pro max",img:""},{t:"Caracol the GOAT",img:""},{t:"Menos encuestas y más desarrollar el juego",img:""}]};
+// Seguidores: cambia estos números y los caracoles corren según ellos (gana el que más tenga).
+var SEGUIDORES=[
+ {red:"YouTube",n:120},
+ {red:"TikTok",n:340},
+ {red:"Instagram",n:85}
+];
 /* ===== FIN DEL CONTENIDO ===== */
 
 var PH="data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30' shape-rendering='crispEdges'><rect width='40' height='30' fill='#2a3834'/><rect x='13' y='8' width='14' height='14' fill='none' stroke='#ce79c8' stroke-width='2'/></svg>");
@@ -241,7 +273,8 @@ function card(e){return '<article class="dlg"><div class="av" aria-hidden="true"
 function render(){var a=all();document.getElementById("latest").innerHTML=card(a[0]);document.getElementById("entries").innerHTML=a.map(card).join("")}
 function show(){var h=(location.hash||"#inicio").slice(1);if(!document.getElementById(h))h="inicio";
  document.querySelectorAll("section").forEach(function(s){s.classList.toggle("on",s.id===h)});
- document.querySelectorAll("nav a").forEach(function(a){if(a.dataset.s===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")})}
+ document.querySelectorAll("nav a").forEach(function(a){if(a.dataset.s===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+ if(h==="enlaces")carrera()}
 window.addEventListener("hashchange",show);
 document.getElementById("theme").onclick=function(){var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":!matchMedia("(prefers-color-scheme: light)").matches;r.dataset.theme=dark?"light":"dark"};
 
@@ -326,6 +359,49 @@ document.getElementById("bk-x").onclick=closeBook;
 document.getElementById("book").onclick=function(e){if(e.target===this)closeBook()};
 document.addEventListener("keydown",function(e){if(!bookOpen())return;if(e.key==="Escape")closeBook();if(e.key==="ArrowLeft")flip(-1);if(e.key==="ArrowRight")flip(1)});
 var rz;window.addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(!bookOpen())return;var f=bk.i/bk.p.length;openBook(bk.n);bk.i=Math.floor(f*bk.p.length/bk.per)*bk.per;pages()},150)});
+
+/* ===== Carrera de caracoles: gráfica horizontal con paleta retro ===== */
+var PAL={
+ YouTube:{shell:["#ee8695","#ee8695","#d95763","#d95763","#d95763","#a53c4c","#a53c4c"],bar:"#d95763"},
+ TikTok:{shell:["#a6ecf5","#a6ecf5","#5fcde4","#5fcde4","#5fcde4","#3f8fa8","#3f8fa8"],bar:"#5fcde4"},
+ Instagram:{shell:["#eaa8d6","#eaa8d6","#d77bba","#d77bba","#d77bba","#a2559a","#a2559a"],bar:"#d77bba"},
+ def:{shell:["#a6d86e","#a6d86e","#8fbf63","#8fbf63","#8fbf63","#648940","#648940"],bar:"#8fbf63"}
+};
+function snailSVG(p){
+ var rows=[[4,4,2],[3,6,3],[2,8,4],[2,8,5],[2,8,6],[2,8,7],[3,6,8]],o='<svg viewBox="0 0 16 12" aria-hidden="true">';
+ rows.forEach(function(r,i){o+='<rect x="'+r[0]+'" y="'+r[2]+'" width="'+r[1]+'" height="1" fill="'+p.shell[i]+'"/>'});
+ o+='<g fill="#222034"><rect x="5" y="4" width="3" height="1"/><rect x="4" y="5" width="1" height="2"/><rect x="5" y="7" width="3" height="1"/><rect x="7" y="5" width="1" height="2"/></g>';
+ o+='<g fill="#fff" opacity=".5"><rect x="4" y="3" width="2" height="1"/></g>';
+ o+='<g fill="#eec39a"><rect x="1" y="9" width="13" height="2"/><rect x="11" y="7" width="3" height="2"/><rect x="12" y="5" width="1" height="2"/><rect x="14" y="5" width="1" height="2"/></g>';
+ o+='<g fill="#222034"><rect x="12" y="4" width="1" height="1"/><rect x="14" y="4" width="1" height="1"/></g></svg>';
+ return o}
+/* eje con números redondos: el máximo se divide en 4 tramos iguales */
+function escala(m){if(m<=0)return 4;var e=Math.pow(10,Math.floor(Math.log10(m))),f=m/e,n=[1,2,4,8,10].filter(function(x){return x>=f})[0];return Math.max(4,n*e)}
+var rt=0;
+function carrera(){
+ var S=SEGUIDORES.map(function(s){return {red:s.red,n:Math.max(0,+s.n||0)}}),
+  max=Math.max.apply(null,S.map(function(s){return s.n})),top=escala(max),
+  box=document.getElementById("lanes"),msg=document.getElementById("racemsg"),
+  reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+ clearTimeout(rt);msg.textContent="";
+ var ax="";for(var k=0;k<=4;k++)ax+='<span style="left:'+k*25+'%">'+Math.round(top*k/4).toLocaleString("es-ES")+'</span>';
+ box.innerHTML=S.map(function(s,i){var p=PAL[s.red]||PAL.def;
+  return '<div class="lane"><div class="lane-top"><b>'+esc(s.red)+'</b><span>'+s.n.toLocaleString("es-ES")+' seguidores<span class="rk" id="rk'+i+'"></span></span></div><div class="rail"><div class="bar" id="rb'+i+'" style="background:'+p.bar+'"></div><div class="rsnail" id="rs'+i+'">'+snailSVG(p)+'</div></div></div>'}).join("")+'<div class="axis" aria-hidden="true">'+ax+'</div>';
+ void box.offsetWidth;
+ var dur=0;
+ S.forEach(function(s,i){var n=document.getElementById("rs"+i),b=document.getElementById("rb"+i),pos=s.n/top*100,t=reduce?0:pos*.07;
+  dur=Math.max(dur,t);
+  n.style.transition="left "+t+"s linear";b.style.transition="width "+t+"s linear";
+  n.style.left=pos+"%";b.style.width=pos+"%";
+  if(pos>0&&t>0){n.classList.add("go");setTimeout(function(){n.classList.remove("go")},t*1000)}});
+ rt=setTimeout(function(){
+  S.forEach(function(s,i){var r=1+S.filter(function(o){return o.n>s.n}).length,k=document.getElementById("rk"+i);
+   if(max>0){k.textContent=r+"º";k.classList.add("on")}});
+  if(!max){msg.textContent="Aún sin seguidores: los caracoles esperan en la línea de salida."}
+  else{var w=S.filter(function(s){return s.n===max}).map(function(s){return s.red});
+   msg.textContent=w.length===1?"¡Gana "+w[0]+"!":"¡Empate entre "+w.join(" y ")+"!"}
+ },dur*1000+150)}
+document.getElementById("again").onclick=carrera;
 
 function poll(){var O=ENCUESTA.opciones,v=ls("cc_poll");if(!v||v.length!==O.length)v=O.map(function(){return 0});
  var voted=ls("cc_voted"),tot=v.reduce(function(a,b){return a+b},0),box=document.getElementById("opts");
