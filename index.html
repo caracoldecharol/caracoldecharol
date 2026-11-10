@@ -43,13 +43,11 @@ section{display:none}section.on{display:block}
 .hero{padding-top:8px}
 .blink{animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
 footer{text-align:center;color:var(--muted);padding:20px 0}
-.dlg{display:grid;grid-template-columns:96px 1fr;gap:16px;margin:0 0 32px;align-items:start}
-.av{width:96px;height:96px;border:3px solid var(--line);background:var(--panel) url(imagenes/cara.png) center/cover no-repeat;image-rendering:pixelated;box-shadow:4px 4px 0 var(--line)}
+.dlg{margin:0 0 32px}
 .msg{border:3px solid var(--line);background:var(--panel);box-shadow:6px 6px 0 var(--line);padding:22px 16px 14px;position:relative}
 .msg::before{content:"";position:absolute;left:-13px;top:30px;border:9px solid transparent;border-right-color:var(--line);border-left:0}
 .msg .tag2{position:absolute;top:-14px;left:12px;background:var(--shell);color:#222034;font-family:'Press Start 2P',monospace;font-size:9px;padding:5px 7px}
 .msg h3{color:var(--shell)}.msg .pic{display:block;width:100%;max-height:300px;object-fit:cover;border:3px solid var(--line);margin:8px 0}.msg p{margin:.4em 0 0}
-@media (max-width:520px){.dlg{grid-template-columns:64px 1fr;gap:12px}.av{width:64px;height:64px}.msg::before{top:18px}}
 /* ===== PESTAÑA EL JUEGO ===== */
 .sinopsis{display:grid;gap:22px;align-items:center}.sinopsis.ph{grid-template-columns:200px 1fr}
 .sprite-big{width:200px;image-rendering:pixelated;filter:drop-shadow(6px 6px 0 var(--line))}
@@ -269,7 +267,7 @@ function ls(k,v){try{if(v===undefined){return JSON.parse(localStorage.getItem(k)
 function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
 function fmt(d){try{return new Date(d+"T12:00:00").toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"})}catch(e){return d}}
 function all(){return SEED.slice().sort(function(a,b){return a.date<b.date?1:-1})}
-function card(e){return '<article class="dlg"><div class="av" aria-hidden="true"></div><div class="msg"><span class="tag2">'+fmt(e.date)+'</span><h3>'+esc(e.title)+'</h3>'+(e.img?'<img class="pic" alt="Foto de la entrada" src="'+e.img+'">':'')+'<p>'+esc(e.text).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>")+'</p></div></article>'}
+function card(e){return '<article class="dlg"><div class="msg"><span class="tag2">'+fmt(e.date)+'</span><h3>'+esc(e.title)+'</h3>'+(e.img?'<img class="pic" alt="Foto de la entrada" src="'+e.img+'">':'')+'<p>'+esc(e.text).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>")+'</p></div></article>'}
 function render(){var a=all();document.getElementById("latest").innerHTML=card(a[0]);document.getElementById("entries").innerHTML=a.map(card).join("")}
 function show(){var h=(location.hash||"#inicio").slice(1);if(!document.getElementById(h))h="inicio";
  document.querySelectorAll("section").forEach(function(s){s.classList.toggle("on",s.id===h)});
