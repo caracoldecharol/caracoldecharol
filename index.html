@@ -142,6 +142,15 @@ details.more .gal3{margin-top:22px}
 .axis span{position:absolute;top:0;transform:translateX(-50%)}
 #racemsg{margin:8px 0 10px;min-height:1.4em}
 @media (max-width:520px){.rail,.axis{margin-left:60px}.rsnail{width:56px;height:42px}}
+  
+/* ===== Caracol que suelta un corazón y rueda ===== */
+.snail{cursor:pointer}
+.snail .cora{position:absolute;left:78px;top:18px;width:21px;height:18px;pointer-events:none;animation:cora .9s steps(6) both}
+.snail .cora svg{animation:none}
+@keyframes cora{from{transform:translateY(8px);opacity:1}70%{opacity:1}to{transform:translateY(-14px);opacity:0}}
+.snail.rueda svg{transform-origin:37.5% 45.8%;animation:rueda .6s steps(8) infinite}
+@keyframes rueda{from{transform:translateY(14px) rotate(0)}to{transform:translateY(14px) rotate(360deg)}}
+  
 </style>
 </head>
 <body>
@@ -412,6 +421,31 @@ function poll(){var O=ENCUESTA.opciones,v=ls("cc_poll");if(!v||v.length!==O.leng
   b.onclick=function(){if(ls("cc_voted")!==null)return;v[i]++;ls("cc_poll",v);ls("cc_voted",i);poll()};box.appendChild(b)});
  document.getElementById("total").textContent=voted!==null?"Gracias por votar. Votos en este navegador: "+tot:"Pulsa una opción para votar y ver los resultados."}
  document.addEventListener("click",function(e){var i=e.target.closest(".pics .pic");if(!i)return;var lb=document.getElementById("lb");lb.querySelector("img").src=i.src;lb.querySelector("p").textContent=i.alt;lb.classList.add("on")});
+/*caracol rueda*/
+  (function(){
+ var sn=document.querySelector(".track .snail");if(!sn)return;
+ var tr=sn.parentNode,sv=sn.firstElementChild,full=sv.innerHTML,busy=false;
+ var HEART='<svg viewBox="0 0 7 6" aria-hidden="true"><g fill="#e8648c"><rect x="1" y="0" width="2" height="1"/><rect x="4" y="0" width="2" height="1"/><rect x="0" y="1" width="7" height="2"/><rect x="1" y="3" width="5" height="1"/><rect x="2" y="4" width="3" height="1"/><rect x="3" y="5" width="1" height="1"/></g><rect x="1" y="1" width="1" height="1" fill="#fff" opacity=".6"/></svg>';
+ var SHELL='<g fill="#648940"><rect x="4" y="2" width="4" height="1"/><rect x="3" y="3" width="6" height="1"/><rect x="2" y="4" width="8" height="4"/><rect x="3" y="8" width="6" height="1"/></g><g fill="#323c39"><rect x="5" y="4" width="3" height="1"/><rect x="4" y="5" width="1" height="2"/><rect x="5" y="7" width="3" height="1"/><rect x="7" y="5" width="1" height="2"/></g><g fill="#fff" opacity=".6"><rect x="4" y="3" width="2" height="1"/></g>';
+ sn.addEventListener("click",function(){
+  if(busy||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  busy=true;
+  var h=document.createElement("span");h.className="cora";h.innerHTML=HEART;sn.appendChild(h);
+  setTimeout(function(){h.remove()},900);
+  setTimeout(function(){
+   var x=parseFloat(getComputedStyle(sn).left)||0;
+   sn.style.animation="none";sn.style.left=x+"px";void sn.offsetWidth;
+   sv.innerHTML=SHELL;sn.classList.add("rueda");
+   sn.style.transition="left 2.4s ease-in";sn.style.left=tr.clientWidth+"px";
+   setTimeout(function(){
+    sn.classList.remove("rueda");sv.innerHTML=full;
+    sn.style.transition="none";sn.style.animation="";sn.style.left="";
+    busy=false;
+   },2500);
+  },700);
+ });
+})();
+  
 render();sinop();galeria();guiones();poll();show();
 </script>
 </body>
