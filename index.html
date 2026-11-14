@@ -150,6 +150,8 @@ details.more .gal3{margin-top:22px}
 @keyframes cora{from{transform:translateY(8px);opacity:1}70%{opacity:1}to{transform:translateY(-14px);opacity:0}}
 .snail.rueda svg{transform-origin:37.5% 45.8%;animation:rueda .6s steps(8) infinite}
 @keyframes rueda{from{transform:translateY(14px) rotate(0)}to{transform:translateY(14px) rotate(360deg)}}
+.snail.susto svg{transform-origin:25% 100%;animation:susto .5s steps(5) forwards}
+@keyframes susto{0%{transform:translateY(0) rotate(0)}30%{transform:translateY(-12px) rotate(-10deg)}60%{transform:translateY(0) rotate(-6deg)}100%{transform:translateY(0) rotate(-6deg)}}
   
 </style>
 </head>
@@ -422,7 +424,7 @@ function poll(){var O=ENCUESTA.opciones,v=ls("cc_poll");if(!v||v.length!==O.leng
  document.getElementById("total").textContent=voted!==null?"Gracias por votar. Votos en este navegador: "+tot:"Pulsa una opción para votar y ver los resultados."}
  document.addEventListener("click",function(e){var i=e.target.closest(".pics .pic");if(!i)return;var lb=document.getElementById("lb");lb.querySelector("img").src=i.src;lb.querySelector("p").textContent=i.alt;lb.classList.add("on")});
 /*caracol rueda*/
-  (function(){
+(function(){
  var sn=document.querySelector(".track .snail");if(!sn)return;
  var tr=sn.parentNode,sv=sn.firstElementChild,full=sv.innerHTML,busy=false;
  var HEART='<svg viewBox="0 0 7 6" aria-hidden="true"><g fill="#e8648c"><rect x="1" y="0" width="2" height="1"/><rect x="4" y="0" width="2" height="1"/><rect x="0" y="1" width="7" height="2"/><rect x="1" y="3" width="5" height="1"/><rect x="2" y="4" width="3" height="1"/><rect x="3" y="5" width="1" height="1"/></g><rect x="1" y="1" width="1" height="1" fill="#fff" opacity=".6"/></svg>';
@@ -432,9 +434,14 @@ function poll(){var O=ENCUESTA.opciones,v=ls("cc_poll");if(!v||v.length!==O.leng
   busy=true;
   var h=document.createElement("span");h.className="cora";h.innerHTML=HEART;sn.appendChild(h);
   setTimeout(function(){h.remove()},900);
+  /* susto: se queda quieto y retrocede un poco */
+  var x=parseFloat(getComputedStyle(sn).left)||0,b=x>0?Math.max(x-40,0):x;
+  sn.style.animation="none";sn.style.left=x+"px";void sn.offsetWidth;
+  sn.classList.add("susto");
+  sn.style.transition="left .3s ease-out";sn.style.left=b+"px";
+  /* se esconde en la concha y rueda hasta el final */
   setTimeout(function(){
-   var x=parseFloat(getComputedStyle(sn).left)||0;
-   sn.style.animation="none";sn.style.left=x+"px";void sn.offsetWidth;
+   sn.classList.remove("susto");
    sv.innerHTML=SHELL;sn.classList.add("rueda");
    sn.style.transition="left 2.4s ease-in";sn.style.left=tr.clientWidth+"px";
    setTimeout(function(){
@@ -442,7 +449,7 @@ function poll(){var O=ENCUESTA.opciones,v=ls("cc_poll");if(!v||v.length!==O.leng
     sn.style.transition="none";sn.style.animation="";sn.style.left="";
     busy=false;
    },2500);
-  },700);
+  },900);
  });
 })();
   
